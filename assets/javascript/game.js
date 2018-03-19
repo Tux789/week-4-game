@@ -179,7 +179,7 @@ function attackButton(){
 		if (defender.hp > 0){
 			defender.hp = defender.hp - player.attack;
 			console.log($("#playerFightArea > .characterDiv"));
-			playerDiv.animate({top: "+=2000px"},"normal");
+			playerDiv.addClass("pAttackAnimate");
 			enemyDiv.addClass("hitAnimate");
 			//update health bar of enemy
 			$("#targetArea > .characterDiv > .characterHealth .characterHealthBar").css("width", defender.hp/defender.maxHp * 100);
@@ -191,6 +191,7 @@ function attackButton(){
 			if (defender.hp > 0){
 				player.hp = player.hp - defender.counterAttack;
 				playerDiv.addClass("hitAnimate");
+				//setTimeout(function(){enemyDiv.addClass("dAttackAnimate")},100);
 				$("#PlayerFightArea > .characterDiv > .characterHealth .characterHealthBar").css("width", player.hp/player.maxHp * 100);
 				if(player.hp <=0){
 					lose();
