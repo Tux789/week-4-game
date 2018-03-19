@@ -1,7 +1,10 @@
 $(document).ready(function() {
+//phase is variable indicating game state
+	//0 = player selection
+	//1 = enemy selection
+	//2 = fight state
 var phase = 0;
-// var playerIndex = 0;
-// var enemyIndex = 0
+// predefined queries
 var playerSelectionAreaDiv = $("#playerSelectionArea");
 var playerAreaDiv = $("#playerArea");
 var enemyAreaDiv = $("#enemyArea");
@@ -9,74 +12,95 @@ var playerFightAreaDiv = $("#playerFightArea");
 var targetAreaDiv = $("#targetArea");
 var instructionsDiv = $("#instructions");
 
-function Character(name, imgSrc, maxHp, baseAttack,counterAttack,isPlayer,isRendered, parentDiv){
+//Character data model
+function Character(name, imgSrc, maxHp, baseAttack,counterAttack, parentDiv){
+	//character name
 	this.name = name;
+	//image sorce for the character image
 	this.imgSrc = imgSrc;
+	// initial hp value, used for game restart
 	this.maxHp = maxHp;
+	// current hp value
 	this.hp = maxHp;
+	// initial attack value, used for game restart
 	this.baseAttack = baseAttack;
+	// current attack value, used for player characters attack
 	this.attack = baseAttack;
+	// counter attack value, player = attack increment, defender = attack against player
 	this.counterAttack = counterAttack;
-	this.isPlayer = isPlayer;
-	this.isRendered = isRendered;
+	// div the character block is attached to, if null then blcok will not be rendered
 	this.parentDiv = parentDiv;
+	//unique identifier, index within CharacterArray.array
 	this.index = 0;
+	//render creates and populates the html elements for an individual character "block"
+
 	this.render = function(inputDiv, index, addClasses = ""){
+		//set parentDiv to inputDiv
 		this.parentDiv = inputDiv;
+		// create overall container div for character
 		var newDiv = $("<div>");
 		newDiv.addClass("characterDiv");
 		if(addClasses !== ""){
 		newDiv.addClass(addClasses);
 			}
+		// populate index
 		this.index = index;
+		//set attributes in html as they are in js data model
 		newDiv.attr("data-index",index);
 		newDiv.attr("data-attack", this.attack);
 		newDiv.attr("data-baseAttack", this.baseAttack);
 		newDiv.attr("data-hp", this.hp);
 		newDiv.attr("data-counterAttack", this.counterAttack);
 		newDiv.attr("data-maxHp",this.maxHp);
+		//create name div
 		var newNameSpan = $("<div>");
 		 newNameSpan.text(this.name);
 		 newNameSpan.addClass("characterName");
+		 //create image 
 		var newImgSpan = $("<img>");
 		newImgSpan.attr("src",this.imgSrc);
 		newImgSpan.addClass("characterImg");
+		// create health bar container
 		var newHealthSpan = $("<div>");
 		newHealthSpan.addClass("characterHealth");
 		newHealthSpan.attr("value",this.hp);
+		// create health bar
 		var newHealthBar = $("<div>");
 		newHealthBar.addClass("characterHealthBar");
 		var width = this.hp/this.maxHp*100;
 		newHealthBar.css("width",width);
+		//create text for character's health
 		newHealthText = $("<div>");
 		newHealthText.text(this.hp);
 		newHealthSpan.append(newHealthBar);
-		//newHealthBar.text(this.hp);
+		// append to container div
 		newDiv.append(newNameSpan, newImgSpan, newHealthSpan, newHealthText);
+		// add event
 		$(newDiv).on("click",divPress);
+		// append to parent div
 		if (this.parentDiv !== null){
 		this.parentDiv.append(newDiv);
 			}
 		
 	};
-}
+} // end character
+
+//Data Object for the array of characters and data related to the character collection
 var CharacterArray = {
+	//Array of character objects
 		array: [],
-		
-		// render: function(parentDiv){
-		// 	parentDiv.empty();
-		// 	for(i=0;i<this.array.length;i++){
-		// 		this.array[i].render(parentDiv,i);
-		// 	}
-		// },
+		//index of character chosen by player
 		playerIndex: 0,
+		//index of defender
 		enemyIndex: 0,
+		//number of enemies, when 0 all enemies defeated
 		numEnemies: 0,
+		// render function renders ALL characters and populates them with index. IMPORTANT CharacterArray.render() MUST be ran initially to set the index within Character
 		render: function(){
+			//empty all divs
 			emptyDivs();
 			for(i=0;i<this.array.length;i++){
-				//console.log(this.array[i]);
-				// console.log($("#enemyArea"));
+				// call render function for each character.
 				this.array[i].render(this.array[i].parentDiv,i);
 				
 			}
@@ -84,11 +108,10 @@ var CharacterArray = {
 
 	}
  
-CharacterArray.array.push(new Character("Space Cat", "assets/images/cat1.jpg",100,5,5,false,true,$("#playerSelectionArea")));
-CharacterArray.array.push(new Character("Jeff","assets/images/myUglyMug.png",120,10,5,false,true,$("#playerSelectionArea")));
-CharacterArray.array.push(new Character("The 10:15 to Utica","assets/images/train.png",180,20,5,false,true,$("#playerSelectionArea")));
-CharacterArray.array.push(new Character("Uncomfy Headphones","assets/images/tech2.png",150,15,5,false,true,$("#playerSelectionArea")));
-// CharacterArray.render($("#playerSelectionArea"));
+CharacterArray.array.push(new Character("Space Cat", "assets/images/cat1.jpg",120,10,10,$("#playerSelectionArea")));
+CharacterArray.array.push(new Character("Jeff","assets/images/myUglyMug.png",150,15,15,$("#playerSelectionArea")));
+CharacterArray.array.push(new Character("The 10:15 to Utica","assets/images/train.png",180,20,20,$("#playerSelectionArea")));
+CharacterArray.array.push(new Character("Uncomfy Headphones","assets/images/tech2.png",100,5,5,$("#playerSelectionArea")));
 CharacterArray.numEnemies = CharacterArray.array.length -1;
 instructionsDiv.text("Select your character");
 CharacterArray.render();
@@ -97,10 +120,10 @@ function divPress() {
 	var playerIndex = CharacterArray.playerIndex;
 	var enemyIndex = CharacterArray.enemyIndex;
 	console.log("click");
-	if(phase === 1){
+	if(phase === 1){ //if at enemy selection
 
 	console.log("p1");
-	if(parseInt($(this).attr("data-index")) !== playerIndex){
+	if(parseInt($(this).attr("data-index")) !== playerIndex){ //make sure player isnt clicked, cannot fight self
 		console.log(parseInt($(this).attr("data-index")));
 	CharacterArray.enemyIndex = parseInt($(this).attr("data-index"));
 	enemyIndex = CharacterArray.enemyIndex;
@@ -109,10 +132,10 @@ function divPress() {
 	CharacterArray.array[enemyIndex].render($("#targetArea"), enemyIndex,"target");
 	CharacterArray.render();
 	instructionsDiv.text("Click the attack button to attack");
-	phase = 2;
+	phase = 2; // set phase to fight state
 	}
 } // end phase 1
-	if(phase === 0){
+	if(phase === 0){ //if in player selection
 		
 		console.log("p0");
 		CharacterArray.playerIndex = parseInt($(this).attr("data-index"));
@@ -127,11 +150,11 @@ function divPress() {
 	}
 	$("#playerSelectionArea").empty();
 	instructionsDiv.text("Select an enemy to fight");
-	phase = 1;
+	phase = 1; //set phase to enemy selection
 	}// end phase 0
 console.log("out of div press");
 }
-
+// clear all divs
 function emptyDivs(){
 	$("#playerSelectionArea").empty();
 	$("#playerArea").empty();
@@ -158,11 +181,13 @@ function attackButton(){
 			console.log($("#playerFightArea > .characterDiv"));
 			playerDiv.animate({top: "+=2000px"},"normal");
 			enemyDiv.addClass("hitAnimate");
+			//update health bar of enemy
 			$("#targetArea > .characterDiv > .characterHealth .characterHealthBar").css("width", defender.hp/defender.maxHp * 100);
 			console.log($("#targetArea > .characterDiv"));
 			setTimeout(function(){enemyDiv.removeClass("hitAnimate")},100);
+			//increment player's attack
 			player.attack = player.attack + player.counterAttack;
-			//CharacterArray.render();
+			
 			if (defender.hp > 0){
 				player.hp = player.hp - defender.counterAttack;
 				playerDiv.addClass("hitAnimate");
@@ -171,16 +196,17 @@ function attackButton(){
 					lose();
 				}// end player loss check
 			}// end inner defender hp check
-		else{
+		else{ //defender defeated
 		enemyDiv.addClass("dead");
-		defender.parentDiv = null;
+		// do not render dead enemies div any longer
+		defender.parentDiv = null; 
 		CharacterArray.numEnemies--
 		console.log(CharacterArray.numEnemies);
 		if(CharacterArray.numEnemies<=0){
 			win();
 		}else{
 		player.parentDiv = playerAreaDiv;
-		phase = 1;
+		phase = 1; // go back to enemy selection
 	}
 	}
 }// end first defender hp check
@@ -199,20 +225,12 @@ function resetGame(){
 		char.hp = char.maxHp;
 		char.attack = char.baseAttack;
 		char.render(playerSelectionAreaDiv,i);
+	
+	}
 		CharacterArray.playerIndex = 0;
 		CharacterArray.enemyIndex = 0;
 		CharacterArray.numEnemies = CharacterArray.array.length - 1;
 		instructionsDiv.text("Select a character to be your player");
 		phase = 0;
-	}
 }
-function attack(player,defender){
-	defender.hp = defender.hp - player.attack;
-	if(defender.hp > 0){
-		player.hp = player.hp - defender.counterAttack;
-	}
-}
-// Attack(playerIndex, enemyIndex){
-
-// }
 });
