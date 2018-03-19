@@ -2,6 +2,9 @@ body{
 	font-family: 'Orbitron', sans-serif;
 	background-color: lightgrey;
 }
+#title{
+	float: right;
+}
 .characterDiv{
 	font-family: 'Orbitron', sans-serif;
 	width: 120px;

@@ -198,7 +198,7 @@ function attackButton(){
 			}// end inner defender hp check
 		else{ //defender defeated
 		enemyDiv.addClass("dead");
-		// do not render dead enemies div any longer
+		// do not render dead enemy's div any longer
 		defender.parentDiv = null; 
 		CharacterArray.numEnemies--
 		console.log(CharacterArray.numEnemies);
@@ -222,7 +222,9 @@ function win(){
 function resetGame(){
 	for(i=0;i<CharacterArray.array.length;i++){
 		var char = CharacterArray.array[i];
+		//reset hp
 		char.hp = char.maxHp;
+		// reset attack
 		char.attack = char.baseAttack;
 		char.render(playerSelectionAreaDiv,i);
 	
