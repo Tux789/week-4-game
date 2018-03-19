@@ -1,0 +1,70 @@
+body{
+	font-family: 'Orbitron', sans-serif;
+	background-color: lightgrey;
+}
+.characterDiv{
+	font-family: 'Orbitron', sans-serif;
+	width: 120px;
+	/*height: 180px;*/
+	padding: 10px;
+	margin: 1px;
+	border: 1px solid green;
+	text-align: center;
+	float: left;
+	color: grey;
+	background: url("../images/seamless_paper_texture.png") repeat;
+}
+.characterHealthBar{
+	background-color: red;
+	height:10px;
+	transition: width .1s linear 0s;
+}
+.enemyClass .characterDiv{
+	border: 4px solid red;
+	color: black;
+}
+.enemyClass .characterDiv img{
+	border: 2px solid red;
+}
+.characterName{
+	font-family: 'Exo', sans-serif;
+ height:50px;
+}
+#fightButton{
+font-family: 'Exo',sans-serif;
+}
+.characterImg{
+height: 100px;
+width: 100px;
+}
+.characterHealth{
+text-align: center;
+border: 1px solid green;
+width: 100px;
+margin: auto;
+background-color: white;
+}
+#playerSelectionArea{
+	overflow: hidden;
+}
+#playerArea{
+	overflow: hidden;
+}
+#enemyArea{
+	overflow: hidden;
+}
+#playerFightArea{
+	overflow: hidden;
+}
+#targetArea{
+	overflow: hidden;
+}
+.hitAnimate{
+animation: hit .1s linear 0s infinite alternate; 
+}
+
+@keyframes hit {
+	0% {background-color: white; color: white;}
+	50% {background-color: yellow; color: yellow} 
+	100%{background-color: white; color: white;}
+}
